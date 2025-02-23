@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bahoo! Mail Classic</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        /* Reset CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Tahoma, sans-serif;
+        }
+
+        /* Login Page */
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        .yahoo-logo {
+            text-align: center;
+            font-size: 40px;
+            color: #720e9e;
+            margin-bottom: 30px;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+
+        .login-btn {
+            background: #720e9e;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 16px;
+        }
+
+        .error-msg {
+            color: red;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        /* Main Interface */
+        .wrapper {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: #720e9e;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: white;
+            font-size: 28px;
+            font-family: 'Times New Roman', serif;
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            height: calc(100vh - 70px);
+        }
+
+        /* Left Sidebar */
+        .left-sidebar {
+            background: #fff;
+            border-right: 1px solid #ddd;
+            padding: 20px;
+        }
+
+        .compose-btn {
+            background: #720e9e;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .folder-list {
+            list-style: none;
+        }
+
+        .folder-item {
+            padding: 12px;
+            cursor: pointer;
+            color: #333;
+            display: flex;
+            align-items: center;
+            border-radius: 3px;
+            margin: 5px 0;
+        }
+
+        .folder-item:hover {
+            background: #f5f5f5;
+        }
+
+        .folder-item i {
+            margin-right: 10px;
+            width: 20px;
+            color: #666;
+        }
+
+        /* Email List */
+        .email-list {
+            background: #fff;
+            border-right: 1px solid #ddd;
+        }
+
+        .email-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .email-item:hover {
+            background: #f9f9f9;
+        }
+
+        .email-item.selected {
+            background: #fff8dc;
+        }
+
+        .email-sender {
+            width: 200px;
+            font-weight: bold;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .email-preview {
+            flex: 1;
+            color: #666;
+            margin: 0 20px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .email-date {
+            color: #999;
+            font-size: 12px;
+        }
+
+        /* Email Detail */
+        .email-detail {
+            padding: 30px;
+            display: none;
+        }
+
+        .email-detail.active {
+            display: block;
+        }
+
+        .detail-header {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .detail-subject {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .detail-info {
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .detail-body {
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: #720e9e;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+
+            .left-sidebar {
+                display: none;
+            }
+
+            .email-sender {
+                width: 120px;
+            }
+
+            .email-preview {
+                margin: 0 10px;
+            }
+
+            .header {
+                padding: 15px;
+            }
+
+            .logo {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div class="login-container" id="loginContainer">
+        <div class="yahoo-logo">Bahoo!</div>
+        <form class="login-form" onsubmit="return handleLogin(event)">
+            <input type="email" id="email" placeholder="Email address" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit" class="login-btn">Sign in</button>
+        </form>
+        <div class="error-msg" id="errorMsg">Invalid email or password</div>
+    </div>
+
+    <!-- Main Interface -->
+    <div class="wrapper" id="mainApp">
+        <div class="header">
+            <div class="logo">Bahoo! Mail</div>
+            <div style="color: white">ratnasari90@gmail.com</div>
+        </div>
+
+        <div class="main-container">
+            <!-- Left Sidebar -->
+            <div class="left-sidebar">
+                <ul class="folder-list">
+                    <li class="folder-item"><i class="fa fa-inbox"></i> Inbox (2)</li>
+                    <li class="folder-item"><i class="fa fa-envelope-o"></i> Drafts</li>
+                    <li class="folder-item"><i class="fa fa-paper-plane"></i> Sent</li>
+                    <li class="folder-item"><i class="fa fa-trash"></i> Trash</li>
+                </ul>
+            </div>
+
+            <!-- Email List/Detail -->
+            <div class="email-list" id="emailList"></div>
+            <div class="email-detail" id="emailDetail">
+                <button class="back-btn" onclick="showEmailList()">← Back to Inbox</button>
+                <div class="detail-header">
+                    <h1 class="detail-subject" id="detailSubject"></h1>
+                    <div class="detail-info">
+                        <div>From: <span id="detailSender"></span></div>
+                        <div>Date: <span id="detailDate"></span></div>
+                    </div>
+                </div>
+                <div class="detail-body" id="detailBody"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Login System
+        const validAccount = {
+            email: "ratnasari90@mail.com",
+            password: "ninamybeloved"
+        };
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMsg');
+
+            if(email === validAccount.email && password === validAccount.password) {
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                loadEmails();
+            } else {
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        // Email Data
+        const emails = [
+            
+        {
+                subject: "Account Recovery Request",                
+                sender: "Coorhat Notifications <noreply@coorhat.com>",
+                date: "4 February 2008 . 11:45 PM",
+                body: "Hello, Ratnasari.\n\n" +
+              "We recently received a request to reset the password for your account. The credentials is now same as your email and password\n\n" +  +
+              "If you did not request this change, please ignore this email.\n\n" +
+              "Best regards,\nCoorhat Security Team"
+            },
+        {
+                subject: "My Deepest Condolences, Mrs. Ratnasari",
+                sender: "Dr. Samuel - City Hospital",
+                date: "3 February 2005 . 10:18 AM",
+                body: "Dear Mrs. Ratnasari,\n\n" +
+              "I want to extend my deepest condolences for your loss. I understand that this must be an incredibly difficult time for you and Nina.\n\n" +
+              "I also want to acknowledge the situation surrounding your husband's passing. Given Nina's condition, her perception of reality can sometimes be distorted. It is important to remember that this is not her fault. Children with her condition often struggle to distinguish between what is real and what is not.\n\n" +
+              "If you ever need support or guidance on how to help Nina through this, please don’t hesitate to reach out. My office is always open to you.\n\n" +
+              "Sincerely,\nDr. Samuel\nCity Hospital"
+    },
+            
+
+            {
+        subject: "Are you okay?",
+        sender: "Siti Nur <sitinurkeren@mail.com>",
+            date: "3 Febrary 2008 . 11:45 PM",
+        body: "Hey Ratnasari,\n\n" +
+              "I just heard about what happened to your husband... I’m so sorry. I can’t imagine how hard this must be for you. I hope you're staying strong for Nina.\n\n" +
+              "If you ever need to talk, I’m here. You don’t have to go through this alone.\n\n" +
+              "Take care,\nSiti N."
+    },
+    {
+        subject: "I will come back home soon",
+        date: "1 January 2008 . 13:45 PM",
+        sender: "Syahrandy Waskito <syahrandywaskito666@mail.com>",
+        body: "My love,\n\n" +
+              "I know things have been difficult lately. I’m worried about Nina—she’s been acting strange. She barely speaks to me anymore, and sometimes I hear her talking to someone who isn’t there.\n\n" +
+              "I don’t know what to do. Maybe we should talk to someone about this?\n\n" +
+              "I’ll be home tonight. We can figure this out together.\n\n" +
+              "Take care of her until I get back.\n\n"
+    }
+        ];
+
+        // Email Functions
+        function loadEmails() {
+            const emailList = document.getElementById('emailList');
+            emailList.innerHTML = '';
+            
+            emails.forEach((email, index) => {
+                const item = document.createElement('div');
+                item.className = 'email-item';
+                item.innerHTML = `
+                    <div class="email-sender">${email.sender}</div>
+                    <div class="email-preview">${email.subject}</div>
+                    <div class="email-date">${email.date}</div>
+                `;
+                item.addEventListener('click', () => showEmailDetail(index));
+                emailList.appendChild(item);
+            });
+        }
+
+        function showEmailDetail(index) {
+            const email = emails[index];
+            document.getElementById('emailList').style.display = 'none';
+            document.getElementById('emailDetail').classList.add('active');
+            
+            document.getElementById('detailSubject').textContent = email.subject;
+            document.getElementById('detailSender').textContent = email.sender;
+            document.getElementById('detailDate').textContent = email.date;
+            document.getElementById('detailBody').textContent = email.body;
+        }
+
+        function showEmailList() {
+            document.getElementById('emailList').style.display = 'block';
+            document.getElementById('emailDetail').classList.remove('active');
+        }
+
+        // Compose Email
+        function showCompose() {
+            alert('Compose feature would go here');
+        }
+
+        // Responsive Handling
+        window.addEventListener('resize', () => {
+            if(window.innerWidth < 768) {
+                document.querySelector('.left-sidebar').style.display = 'none';
+            } else {
+                document.querySelector('.left-sidebar').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

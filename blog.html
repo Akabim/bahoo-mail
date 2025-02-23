@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="ISO-8859-1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coorhat!</title>
+    <style>
+        body {
+            background: #ffccff url('data:image/gif;base64,R0lGODlhBAAEAPABAJmZmf///yH5BAEAAAEALAAAAAAEAAQAAAIDjA4ADwA7');
+            font-family: 'Comic Sans MS', Arial;
+            color: #330033;
+            margin: 0;
+        }
+
+        .login-container {
+            width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border: 3px solid #ff0066;
+            box-shadow: 5px 5px 0px #cc99ff;
+        }
+
+        .main {
+            display: none;
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border: 3px solid #ff0066;
+            box-shadow: 5px 5px 0px #cc99ff;
+        }
+
+        .header {
+            background: #99ffff;
+            padding: 15px;
+            text-align: center;
+            border: 2px dashed #ff0066;
+            margin-bottom: 20px;
+        }
+
+        .nav {
+            background: #ffff99;
+            padding: 10px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            background: #ffffcc;
+            border: 2px groove #ff9966;
+            font-family: 'Courier New';
+            margin: 10px 0;
+        }
+
+        .entry {
+            background: #fffff0;
+            border: 1px dotted #ff99cc;
+            margin: 10px 0;
+            padding: 15px;
+        }
+
+        .date {
+            color: #666699;
+            font-size: 12px;
+            border-bottom: 1px dashed #ccc;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container" id="loginContainer">
+        <div class="header">
+            <p>~*~ Login Required ~*~</p>
+        </div>
+        <form onsubmit="return handleLogin(event)">
+            <p>Email:</p>
+            <input type="text" id="emailInput" placeholder="ratnasari90@mail.com">
+            <p>Password:</p>
+            <input type="password" id="passwordInput" placeholder="********">
+            <br><br>
+            <input type="submit" value="Login">
+            <p id="errorMsg" style="color:red; display:none">Password salah! Coba ingat-ingat lagi...</p>
+        </form>
+    </div>
+
+    <div class="main" id="mainDiary">
+        <div class="header">
+            <p>~*~ My 2008 Memories ~*~</p>
+        </div>
+
+        <div class="nav">
+            <button onclick="showNewEntry()">Buat Entry Baru</button>
+            <button onclick="logout()">Logout</button>
+        </div>
+
+        <div id="newEntry" style="display:none">
+            <textarea id="diaryEntry" placeholder="Dear Diary..."></textarea>
+            <button onclick="saveEntry()">Simpan</button>
+            <button onclick="cancelEntry()">Batal</button>
+        </div>
+
+        <div id="entries"></div>
+    </div>
+
+    <script>
+        const validEmail = "ratnasari90@mail.com";
+        const validPassword = "ninamybeloved";
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+            
+            if(email === validEmail && password === validPassword) {
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('mainDiary').style.display = 'block';
+                loadEntries();
+            } else {
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        }
+
+        let entries = [
+        {
+                date: "February 2008",
+                content: "He's gone... I can't believe it. Everything feels empty. I don't know how to tell Nina. I don't even know how to face her..."
+            },    
+        {
+                date: "January 2008",
+                content: "Nina keeps asking me where her father is. I don’t know what to say. I tried telling her the truth, but she just stared at me, confused. Then she whispered, “He wasn’t real, was he?” What does she mean?"
+            },
+            {
+                date: "January 2008",
+                content: "Something is wrong. I woke up last night to find Nina standing in the dark, looking at the door. She was smiling. When I asked what she was doing, she said, “They’re waiting.”"
+            }
+        ];
+
+        function showNewEntry() {
+            document.getElementById('newEntry').style.display = 'block';
+        }
+
+        function saveEntry() {
+            const newEntry = {
+                date: new Date().toLocaleString('id-ID', { 
+                    day: 'numeric', 
+                    month: 'long', 
+                    year: 'numeric', 
+                    hour: '2-digit', 
+                    minute: '2-digit'
+                }),
+                content: document.getElementById('diaryEntry').value
+            };
+            
+            entries.push(newEntry);
+            loadEntries();
+            cancelEntry();
+        }
+
+        function loadEntries() {
+            const entriesDiv = document.getElementById('entries');
+            entriesDiv.innerHTML = entries.map(entry => `
+                <div class="entry">
+                    <div class="date">${entry.date}</div>
+                    <p>${entry.content}</p>
+                </div>
+            `).join('');
+        }
+
+        function cancelEntry() {
+            document.getElementById('newEntry').style.display = 'none';
+            document.getElementById('diaryEntry').value = '';
+        }
+
+        function logout() {
+            document.getElementById('mainDiary').style.display = 'none';
+            document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('errorMsg').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
